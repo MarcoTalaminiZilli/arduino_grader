@@ -1,0 +1,20 @@
+# Ambientes virtuais
+venv/
+env/
+.venv/
+
+# Relatórios gerados automaticamente pelo sistema
+*.xlsx
+relatorio_notas.xlsx
+
+# Cache do Python e testes
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Pastas de submissões locais dos alunos
+submissions/
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
