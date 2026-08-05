@@ -77,7 +77,7 @@ Você pode ajustar os pesos e caminhos das pastas alterando o arquivo `config.js
    Coloque o arquivo `.ino` de referência na pasta `solutions/` (Exemplo: `E1T1_solution.ino`).
 
 2. **Adicionar os Trabalhos dos Alunos:**
-   Coloque os arquivos dos alunos na pasta `submissions/`. O padrão esperado de nome de arquivo é `IDALUNO_EXERCICIO.ino` (Exemplo: `joao123_E1T1.ino`).
+   Crie uma pasta `submissions/` e coloque os arquivos dos alunos nela. O padrão esperado de nome de arquivo é `IDALUNO_EXERCICIO.ino` (Exemplo: `joao123_E1T1.ino`).
 
 3. **Executar a Avaliação:**
    No terminal, rode o script principal:
@@ -87,5 +87,15 @@ Você pode ajustar os pesos e caminhos das pastas alterando o arquivo `config.js
 
 4. **Visualizar os Resultados:**
    Um relatório formatado será gerado na raiz do projeto com o nome definido no `config.json` (padrão: `relatorio_notas.xlsx`).
+
+---
+
+## Tests
+
+Para testar as funcionalidades do **evaluator.py** e **loader.py**, abra o terminal na raiz do projeto e rode
+
+```bash
+pytest -v
+```
 
 ---
