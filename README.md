@@ -1,19 +1,18 @@
-# Arduino Grader
+# Arduino Grader - Branch LLM
 
-O **Arduino Grader** é uma ferramenta em Python desenvolvida para automatizar a correção e avaliação estática de códigos de Arduino (`.ino`) submetidos por alunos.
+O **Arduino Grader** nesta branch utiliza uma **LLM local (via Ollama)** para automatizar a correção e avaliação semântica de códigos do Arduino (`.ino`). 
 
-O projeto analisa a estrutura do código C++/Arduino utilizando expressões regulares e heurísticas leves, validando a presença de funções essenciais (`setup` e `loop`) e comparando o uso de instruções com um código de gabarito oficial. Os resultados são exportados diretamente para um relatório formatado em Excel.
+Diferente de corretores baseados apenas em expressões regulares, a IA analisa a **lógica** do programa, ignorando variações de sintaxe ou de estilo (como nomes de variáveis diferentes) e gerando um **feedback explicativo** para cada aluno.
 
 ---
 
 ## Funcionalidades
 
-- **Análise Estática Leve:** Não depende de parsers de C rígidos, sendo imune a erros comuns de compilação ou macros específicas do ecossistema Arduino.
-- **Pré-processamento de Código:** Remove comentários de bloco (`/* */`) e de linha (`//`) antes da avaliação para evitar falsos positivos.
-- **Detecção de Estruturas:** Verifica se o código possui a estrutura básica de funcionamento (`setup()` e `loop()`).
-- **Mapeamento de Funções:** Compara o conjunto de chamadas de função (`pinMode`, `digitalWrite`, `delay`, etc.) presentes no arquivo do aluno com o gabarito.
-- **Configuração Flexível:** Pesos de notas, pastas de entrada e nomes de relatórios são totalmente customizáveis via `config.json`.
-- **Relatório em Excel:** Gera uma planilha `.xlsx` com formatação visual, notas finais calculadas e status detalhado por entrega.
+- **Avaliação Semântica por IA:** Entende a intenção do código do aluno em vez de apenas buscar palavras-chave exatas.
+- **Respostas Determinísticas:** Utiliza `temperature=0.0` e formato de saída JSON estrito para garantir notas consistentes.
+- **Feedback Automático:** Gera justificativas curtas para cada nota obtida.
+- **Execução 100% Local:** Sem custos de API e sem envio de dados para servidores externos.
+- **Relatório Completo em Excel:** Gera uma planilha `.xlsx` com notas, checagem de estruturas e a coluna de parecer da IA formatada com quebra automática de texto.
 
 ---
 
@@ -21,30 +20,36 @@ O projeto analisa a estrutura do código C++/Arduino utilizando expressões regu
 
 ```text
 arduino_grader/
-├── config.json           # Arquivo de configuração de pesos e diretórios
-├── main.py               # Script principal de execução
-├── requirements.txt      # Dependências do projeto
+├── config.json           # Configuração de diretórios e modelo do Ollama
+├── main.py               # Execução principal do pipeline de avaliação
+├── requirements.txt      # Dependências do projeto (incluindo ollama)
 ├── core/
 │   ├── __init__.py
-│   ├── loader.py         # Leitura, varredura e limpeza de arquivos .ino
-│   ├── evaluator.py      # Lógica de avaliação e cálculo de pontuação
-│   └── reporter.py       # Exportação e formatação do relatório Excel
-├── solutions/            # Pasta reservada para os arquivos de gabarito (.ino)
-└── submissions/          # Pasta reservada para os arquivos dos alunos (.ino)
+│   ├── loader.py         # Leitura e limpeza de comentários do arquivo .ino
+│   ├── evaluator.py      # Integração com a API local do Ollama e avaliação
+│   └── reporter.py       # Gerador do relatório formatado em Excel
+├── solutions/            # Gabaritos de referência (.ino)
+└── submissions/          # Entregas dos alunos (.ino)
 ```
 
 ---
 
 ## Pré-requisitos e Instalação
 
-### 1. Clonar o repositório
+### 1. Selecionar a branch `llm`
 ```bash
-git clone [https://github.com/SEU_USUARIO/arduino-grader.git](https://github.com/SEU_USUARIO/arduino-grader.git)
-cd arduino-grader
+git checkout llm
 ```
 
-### 2. Instalar as dependências
-Certifique-se de ter o Python 3.8+ instalado. Instale os pacotes necessários rodando:
+### 2. Instalar e iniciar o Ollama
+Certifique-se de ter o [Ollama](https://ollama.com/) instalado no seu sistema.
+
+Inicialize o serviço do Ollama e baixe o modelo desejado (por padrão, o `llama3`):
+```bash
+ollama pull llama3
+```
+
+### 3. Instalar as dependências Python
 ```bash
 pip install -r requirements.txt
 ```
@@ -53,7 +58,7 @@ pip install -r requirements.txt
 
 ## Configuração (`config.json`)
 
-Você pode ajustar os pesos e caminhos das pastas alterando o arquivo `config.json` na raiz do projeto:
+Edite o arquivo `config.json` para definir o modelo do Ollama e as pastas de trabalho:
 
 ```json
 {
@@ -62,40 +67,24 @@ Você pode ajustar os pesos e caminhos das pastas alterando o arquivo `config.js
     "entregas": "submissions",
     "relatorio_saida": "relatorio_notas.xlsx"
   },
-  "pesos_avaliacao": {
-    "estrutura_basica": 50.0,
-    "chamadas_funcao": 50.0
-  }
+  "modelo_ollama": "llama3"
 }
 ```
 
 ---
 
-## Como Usar
+## Passo a Passo para Testar
 
-1. **Adicionar o Gabarito:**
-   Coloque o arquivo `.ino` de referência na pasta `solutions/` (Exemplo: `E1T1_solution.ino`).
-
-2. **Adicionar os Trabalhos dos Alunos:**
-   Crie uma pasta `submissions/` e coloque os arquivos dos alunos nela. O padrão esperado de nome de arquivo é `IDALUNO_EXERCICIO.ino` (Exemplo: `joao123_E1T1.ino`).
-
-3. **Executar a Avaliação:**
-   No terminal, rode o script principal:
+1. **Gabarito:** Coloque um arquivo de referência em `solutions/` (ex: `E1T1_solution.ino`).
+2. **Entregas:** Coloque um ou mais arquivos de teste em `submissions/` (ex: `aluno01_E1T1.ino`).
+3. **Execução:** Garanta que o Ollama esteja rodando em segundo plano e execute:
    ```bash
    python main.py
    ```
-
-4. **Visualizar os Resultados:**
-   Um relatório formatado será gerado na raiz do projeto com o nome definido no `config.json` (padrão: `relatorio_notas.xlsx`).
+4. **Resultado:** Abra o arquivo `relatorio_notas.xlsx` gerado na raiz do projeto para verificar as notas e os feedbacks produzidos pela IA.
 
 ---
 
-## Tests
+## Licença
 
-Para testar as funcionalidades do **evaluator.py** e **loader.py**, abra o terminal na raiz do projeto e rode
-
-```bash
-pytest -v
-```
-
----
+Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
