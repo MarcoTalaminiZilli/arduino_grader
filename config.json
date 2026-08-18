@@ -4,8 +4,5 @@
     "entregas": "submissions",
     "relatorio_saida": "relatorio_notas.xlsx"
   },
-  "pesos_avaliacao": {
-    "estrutura_basica": 50.0,
-    "chamadas_funcao": 50.0
-  }
+  "modelo_ollama": "llama3"
 }
