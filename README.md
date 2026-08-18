@@ -45,7 +45,7 @@ git checkout llm
 ### 2. Instalar e iniciar o Ollama
 Certifique-se de ter o [Ollama](https://ollama.com/) instalado no seu sistema.
 
-Inicialize o serviço do Ollama e baixe o modelo desejado (por exemplo, `llama3`):
+Inicialize o serviço do Ollama e baixe o modelo desejado (ver aviso abaixo sobre a escolha do modelo):
 ```bash
 ollama pull llama3
 ```
