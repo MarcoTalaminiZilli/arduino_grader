@@ -2,7 +2,7 @@ import os
 import json
 from core.loader import CodeLoader
 from core.evaluator import CodeEvaluator
-from core.reporter import Reporter
+from core.reporter import ExcelReporter
 
 def load_config(config_path="config.json"):
     """Lê o arquivo de configuração JSON."""
@@ -22,19 +22,16 @@ def run():
     if not config:
         return
 
-    # Extrai as informações do config para variáveis
     sol_dir = config["diretorios"]["solucoes"]
     sub_dir = config["diretorios"]["entregas"]
     output_file = config["diretorios"]["relatorio_saida"]
-    pesos = config["pesos_avaliacao"]
     
     # Verifica se as pastas existem
     if not os.path.exists(sol_dir) or not os.path.exists(sub_dir):
         print(f"Verifique se as pastas '{sol_dir}' e '{sub_dir}' existem.")
         return
 
-    # 2. Carrega o gabarito (Exemplo estático para o arquivo E1T1)
-    # Em uma versão futura, você pode iterar sobre vários gabaritos diferentes
+    # 2. Carrega o gabarito
     sol_path = os.path.join(sol_dir, "E1T1_solution.ino")
     solution_code = CodeLoader.load_ino_file(sol_path)
     
@@ -46,24 +43,25 @@ def run():
     submissions = CodeLoader.scan_submissions(sub_dir)
     results = []
 
-    # 4. Avalia cada aluno usando os pesos do config.json
+    # 4. Avalia cada aluno via IA utilizando as configurações do config.json
     for sub in submissions:
         submission_code = CodeLoader.load_ino_file(sub["filepath"])
         
-        # Repassa os 'pesos' lidos do JSON para o Evaluator
-        eval_result = CodeEvaluator.evaluate(solution_code, submission_code, pesos)
+        # Repassa 'config' completo para o Evaluator acessar os parâmetros da IA
+        eval_result = CodeEvaluator.evaluate(solution_code, submission_code, config)
 
-        # Junta tudo na linha final da planilha
+        # Monta a estrutura esperada pelo novo ExcelReporter
         entry = {
-            "Aluno ID": sub["student_id"],
-            "Exercício": sub["assignment_id"],
-            "Arquivo": sub["filename"],
-            **eval_result
+            "aluno_id": sub["student_id"],
+            "exercicio": sub["assignment_id"],
+            "has_essential": eval_result.get("has_essential", False),
+            "final_score": eval_result.get("final_score", 0.0),
+            "feedback": eval_result.get("feedback", "Sem observações.")
         }
         results.append(entry)
 
-    # 5. Gera o relatório
-    Reporter.export_to_excel(results, output_file)
+    # 5. Gera o relatório em Excel
+    ExcelReporter.generate_report(results, output_file)
 
 if __name__ == "__main__":
     run()
