@@ -18,6 +18,7 @@ A IA analisa a **lógica** do programa, comparando o código do aluno com o gaba
 ---
 
 ## Estrutura do Projeto
+Certifique-se de que a estrutura do projeto é essa, crie a pasta **submissions** para colocar os códigos a serem avaliados.
 
 ```text
 arduino_grader/
@@ -69,7 +70,7 @@ Edite o arquivo `config.json` para definir pastas, o modelo do Ollama e as instr
     "relatorio_saida": "relatorio_notas.xlsx"
   },
   "modelo_ollama": "llama3",
-  "prompt_sistema": "Você é um professor avaliando um código C++/Arduino enviado por um aluno. Compare a LÓGICA do código do aluno com o GABARITO fornecido.\n\nDiretrizes de avaliação:\n1. Ignore diferenças puramente sintáticas ou de estilo (ex: uso de variáveis para pinos, troca de 'for' por 'while', nomes de variáveis diferentes).\n2. Verifique se a funcionalidade esperada pelo gabarito é atingida.\n3. Verifique se as funções essenciais setup() e loop() existem.\n\nRegras de saída:\nResponda EXCLUSIVAMENTE um objeto JSON com esta estrutura exata:\n{\n  \"nota\": <float entre 0.0 e 100.0>,\n  \"estruturas_ok\": <boolean true/false>,\n  \"feedback\": \"<string com 1-2 frases explicando o acerto ou o erro do aluno>\"\n}"
+  "prompt_sistema": "Você é um professor avaliando um código C++/Arduino enviado por um aluno. Compare a LÓGICA do código do aluno com o GABARITO fornecido.\n\nDiretrizes de avaliação:\n1. Ignore diferenças puramente sintáticas ou de estilo (ex: uso de variáveis para pinos, número dos pinos em si, troca de 'for' por 'while', nomes de variáveis diferentes etc.).\n2. Verifique se a funcionalidade esperada pelo gabarito é atingida.\n3. Verifique se as funções essenciais setup() e loop() existem.\n\nRegras de saída:\nResponda EXCLUSIVAMENTE um objeto JSON com esta estrutura exata:\n{\n  \"nota\": <float entre 0.0 e 100.0>,\n  \"estruturas_ok\": <boolean true/false>,\n  \"feedback\": \"<string com 1-2 frases explicando o acerto ou o erro do aluno>\"\n}"
 }
 ```
 
@@ -80,16 +81,16 @@ Edite o arquivo `config.json` para definir pastas, o modelo do Ollama e as instr
 
 ---
 
-## Passo a Passo para Testar
+## Passo a Passo para Usar
 
 1. **Gabarito:** Coloque o arquivo de referência na pasta `solutions/` (ex: `E1T1_solution.ino`).
 2. **Entregas:** Coloque os arquivos dos alunos na pasta `submissions/` (ex: `aluno01_E1T1.ino`).
-3. **Execução:** Certifique-se de que o Ollama está rodando e execute:
+3. **Execução:** Certifique-se de que o aplicativo do Ollama está aberto e execute:
    ```bash
    python main.py
    ```
 4. **Resultado:** Abra o arquivo `relatorio_notas.xlsx` gerado na raiz do projeto para visualizar o relatório completo.
-
+> **Importante:** Para que a ferramenta funcione corretamente, sempre feche a planilha antes de rodar o código novamente.
 ---
 
 ## Licença

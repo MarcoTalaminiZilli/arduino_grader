@@ -30,7 +30,7 @@ class CodeEvaluator:
                     {"role": "system", "content": prompt_sistema},
                     {"role": "user", "content": user_content}
                 ],
-                options={"temperature": 0.0},
+                options={"temperature": 0.0, "keep_alive": 0},
                 format="json"
             )
 
